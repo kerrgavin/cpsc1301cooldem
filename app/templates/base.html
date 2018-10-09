@@ -1,9 +1,17 @@
 <html>
 	<head>
-		<link rel="stylesheet" href="css\style.css">
+		<link rel="stylesheet" href="\static\styles\style.css">
 	</head>
 	<body>
-		<img src="resources\pokeball.png" alt="Pokeball">
+		<img src="\static\Pokeball.PNG" alt="Pokeball">
+		<form action="" method="post" novalidate>
+			{{ form.hidden_tag() }}
+			<p>
+				{{ form.text.label }}
+				{{ form.text(size=32) }}
+				{{ form.submit() }}
+			</p>
+		</form>
 	</body>
 
 </html>
