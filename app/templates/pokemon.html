@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ name }}</h1>
+<h3>Types</h3>
+<ul>
+  {% for type in types %}
+    <li>{{ type.type.name }}</li>
+  {% endfor %}
+</ul>
+<h3>Abilities</h3>
+<ul>
+  {% for ability in abilities %}
+    <li>{{ ability.ability.name }}</li>
+  {% endfor %}
+</ul>
+<h3>Moves</h3>
+<ul>
+  {% for move in moves %}
+    <li>{{ move.move.name }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -4,14 +4,15 @@
 	</head>
 	<body>
 		<img src="\static\Pokeball.PNG" alt="Pokeball">
-		<form action="" method="post" novalidate>
+		<form action="{{ url_for('index') }}" method="post" novalidate>
 			{{ form.hidden_tag() }}
 			<p>
 				{{ form.text.label }}
-				{{ form.text(size=32) }}
+				{{ form.text }}
 				{{ form.submit() }}
 			</p>
 		</form>
+		{% block content %}{% endblock %}
 	</body>
 
 </html>
