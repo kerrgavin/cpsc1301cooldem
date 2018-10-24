@@ -2,18 +2,20 @@ import sqlite3
 import datetime
 import json
 import requests
+import shutil
+from app.path import *
 
 def update_list():
     if difference("pokemon") >= 3:
         print("here")
         r = requests.get("https://pokeapi.co/api/v2/pokemon/")
-        file = open("app/data/pokemon.json","w")
+        file = open(DATA_PATH + "pokemon.json","w")
         file.write(r.text)
         reset_time("pokemon")
 
 def difference(item):
     now = datetime.datetime.now()
-    conn = sqlite3.connect("app/data/data.db")
+    conn = sqlite3.connect(DATA_PATH + "data.db")
     cur = conn.cursor()
     cur.execute('''SELECT MONTH, DAY, YEAR, HOUR, MINUTE FROM CACHE_INFO WHERE NAME = ?''', (item, ))
     r = cur.fetchone()
@@ -32,14 +34,14 @@ def difference(item):
 
 def reset_time(item):
     now = datetime.datetime.now()
-    conn = sqlite3.connect("app/data/data.db")
+    conn = sqlite3.connect(DATA_PATH + "data.db")
     cur = conn.cursor()
     cur.execute('''UPDATE CACHE_INFO SET MONTH = ?, DAY = ?, YEAR = ?, HOUR = ?, MINUTE = ? WHERE NAME = ?''', (now.month, now.day, now.year, now.hour, now.minute, item))
     conn.commit()
     conn.close()
 
 def exists(pokemon):
-    file = open("app/data/pokemon.json", "r")
+    file = open(DATA_PATH + "pokemon.json", "r")
     json_data = file.read()
     pokemons = json.loads(json_data)
     for mon in pokemons["results"]:
@@ -48,11 +50,35 @@ def exists(pokemon):
     return False
 
 def get_pokemon_data(pokemon):
-    if difference(pokemon) >= 3:
+    diff = difference(pokemon)
+    if diff >= 3:
         r = requests.get("https://pokeapi.co/api/v2/pokemon/" + pokemon + "/")
-        file = open("app/data/" + pokemon + ".json","w")
+        file = open(DATA_PATH + pokemon + ".json","w")
         file.write(r.text)
         reset_time(pokemon)
-    file = open("app/data/" + pokemon + ".json", "r")
+    file = open(DATA_PATH + pokemon + ".json", "r")
     json_data = file.read()
-    return json.loads(json_data)
+    d = json.loads(json_data)
+    if diff >= 3:
+        print("getting sprites")
+        get_pokemon_sprites(pokemon, d["sprites"])
+    return d
+
+def get_pokemon_sprites(pokemon, sprites):
+    save_sprite(pokemon + "_back_default", sprites["back_default"])
+    save_sprite(pokemon + "_front_default", sprites["front_default"])
+    save_sprite(pokemon + "_back_shiny", sprites["back_shiny"])
+    save_sprite(pokemon + "_front_shiny", sprites["front_shiny"])
+
+def save_sprite(name, url):
+    r = requests.get(url, stream=True)
+    with open(SPRITE_SAVE_PATH + name + ".png", "wb") as out_file:
+        shutil.copyfileobj(r.raw, out_file)
+
+def get_sprites_dict(pokemon):
+    sprites = {}
+    sprites["back_default"] = SPRITE_PATH + pokemon + "_back_default.png"
+    sprites["front_default"] = SPRITE_PATH + pokemon + "_front_default.png"
+    sprites["back_shiny"] = SPRITE_PATH + pokemon + "_back_shiny.png"
+    sprites["front_shiny"] = SPRITE_PATH + pokemon + "_front_shiny.png"
+    return sprites

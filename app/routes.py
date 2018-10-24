@@ -26,6 +26,7 @@ def pokemon():
 	p = request.args.get("p")
 	print("p is: ", p)
 	data = data_management.get_pokemon_data(p)
+	sprites = data_management.get_sprites_dict(p)
 	if form.validate_on_submit():
 		pokemon = form.text.data.lower().strip()
 		data_management.update_list()
@@ -33,4 +34,4 @@ def pokemon():
 			return redirect("/pokemon?p="+pokemon)
 		else:
 			return redirect("/index")
-	return render_template("pokemon.html", title="Pokemon", form=form, name = data["name"].upper(), moves=data["moves"], abilities=data["abilities"], types=data["types"])
+	return render_template("pokemon.html", title="Pokemon", form=form, name = data["name"].upper(), moves=data["moves"], abilities=data["abilities"], types=data["types"], sprites = sprites)
